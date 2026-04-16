@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
 
 import reportsRoutes from './routes/reportsRoutes.js';
 import { testDbConnection } from './config/db.js';
@@ -19,11 +20,12 @@ app.use(express.json());
 // NOTE: multipart/form-data is handled by multer at the route level.
 app.use(express.urlencoded({ extended: true }));
 
-// NOTE: We no longer serve /uploads locally because files are uploaded to S3.
+// Serve frontend static files
+app.use(express.static('public'));
 
-// Health check
+// Home page
 app.get('/', (req, res) => {
-  res.json({ message: 'TrashTrack backend is running' });
+  res.sendFile(path.resolve('public/index.html'));
 });
 
 // API routes

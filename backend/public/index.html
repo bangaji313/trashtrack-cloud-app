@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TrashTrack Waste Reporting</title>
+    <style>
+      :root {
+        --bg: #0b1220;
+        --card: rgba(255, 255, 255, 0.06);
+        --card-border: rgba(255, 255, 255, 0.12);
+        --text: #e7eaf0;
+        --muted: rgba(231, 234, 240, 0.7);
+        --accent: #4f8cff;
+        --accent-2: #22c55e;
+        --danger: #ef4444;
+        --shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+        --radius: 16px;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial,
+          "Apple Color Emoji", "Segoe UI Emoji";
+        background: radial-gradient(900px 500px at 20% 0%, rgba(79, 140, 255, 0.35), transparent 55%),
+          radial-gradient(900px 500px at 100% 20%, rgba(34, 197, 94, 0.22), transparent 55%),
+          var(--bg);
+        color: var(--text);
+      }
+
+      .container {
+        width: min(1100px, 92%);
+        margin: 40px auto 80px;
+      }
+
+      header {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 22px;
+      }
+
+      h1 {
+        font-size: 30px;
+        margin: 0;
+        letter-spacing: 0.2px;
+      }
+
+      .subtitle {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 18px;
+      }
+
+      @media (min-width: 960px) {
+        .grid {
+          grid-template-columns: 380px 1fr;
+          align-items: start;
+        }
+      }
+
+      .panel {
+        background: var(--card);
+        border: 1px solid var(--card-border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 18px;
+        backdrop-filter: blur(10px);
+      }
+
+      label {
+        display: block;
+        margin: 12px 0 6px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      input[type="text"],
+      textarea,
+      input[type="file"] {
+        width: 100%;
+        padding: 11px 12px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(10, 16, 33, 0.55);
+        color: var(--text);
+        outline: none;
+      }
+
+      textarea {
+        min-height: 110px;
+        resize: vertical;
+      }
+
+      .row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-top: 14px;
+      }
+
+      button {
+        appearance: none;
+        border: 0;
+        cursor: pointer;
+        border-radius: 12px;
+        padding: 11px 14px;
+        font-weight: 600;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, var(--accent), #6d5bff);
+        color: white;
+        flex: 1;
+      }
+
+      .btn-primary:disabled {
+        opacity: 0.65;
+        cursor: not-allowed;
+      }
+
+      .btn-secondary {
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--text);
+      }
+
+      .status {
+        margin-top: 12px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .status.success { color: rgba(34, 197, 94, 0.95); }
+      .status.error { color: rgba(239, 68, 68, 0.95); }
+
+      .reports-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+
+      .reports-header h2 {
+        margin: 0;
+        font-size: 18px;
+      }
+
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 14px;
+      }
+
+      .card {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 14px;
+        padding: 14px;
+        overflow: hidden;
+      }
+
+      .card h3 {
+        margin: 0 0 8px;
+        font-size: 16px;
+      }
+
+      .meta {
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 10px;
+      }
+
+      .desc {
+        margin: 0 0 10px;
+        color: rgba(231, 234, 240, 0.9);
+        line-height: 1.45;
+        font-size: 14px;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      .img {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(0,0,0,0.15);
+      }
+
+      .empty {
+        color: var(--muted);
+        font-size: 14px;
+        padding: 14px 0 0;
+      }
+
+      .top-note {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 6px;
+      }
+
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>TrashTrack Waste Reporting</h1>
+        <p class="subtitle">
+          Simple demo frontend (HTML/CSS/Vanilla JS). Posts to <code>POST /reports</code> and loads from <code>GET /reports</code>.
+        </p>
+      </header>
+
+      <div class="grid">
+        <section class="panel">
+          <h2 style="margin: 0 0 10px; font-size: 18px;">Create a Report</h2>
+          <form id="reportForm">
+            <label for="title">Title</label>
+            <input id="title" name="title" type="text" placeholder="e.g. Trash on the street" required />
+
+            <label for="description">Description</label>
+            <textarea id="description" name="description" placeholder="Describe the waste location and condition..." required></textarea>
+
+            <label for="image">Image (optional)</label>
+            <input id="image" name="image" type="file" accept="image/*" />
+
+            <div class="row">
+              <button id="submitBtn" class="btn-primary" type="submit">Submit Report</button>
+              <button class="btn-secondary" type="button" id="resetBtn">Reset</button>
+            </div>
+
+            <p class="status" id="status"></p>
+            <p class="top-note">
+              Tip: Make sure your backend is running at <code>http://localhost:3000</code>.
+            </p>
+          </form>
+        </section>
+
+        <section class="panel">
+          <div class="reports-header">
+            <h2>Latest Reports</h2>
+            <button class="btn-secondary" type="button" id="reloadBtn">Reload</button>
+          </div>
+
+          <div id="reports" class="cards"></div>
+          <div id="empty" class="empty" style="display:none;">No reports yet.</div>
+        </section>
+      </div>
+    </div>
+
+    <script>
+      const form = document.getElementById('reportForm');
+      const statusEl = document.getElementById('status');
+      const submitBtn = document.getElementById('submitBtn');
+      const resetBtn = document.getElementById('resetBtn');
+      const reloadBtn = document.getElementById('reloadBtn');
+      const reportsEl = document.getElementById('reports');
+      const emptyEl = document.getElementById('empty');
+
+      function setStatus(message, type) {
+        statusEl.textContent = message || '';
+        statusEl.className = 'status' + (type ? ' ' + type : '');
+      }
+
+      function escapeHtml(str) {
+        return String(str || '')
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&#039;');
+      }
+
+      function formatDate(value) {
+        if (!value) return '';
+        const d = new Date(value);
+        if (Number.isNaN(d.getTime())) return String(value);
+        return d.toLocaleString();
+      }
+
+      function renderReports(reports) {
+        reportsEl.innerHTML = '';
+
+        if (!reports || reports.length === 0) {
+          emptyEl.style.display = 'block';
+          return;
+        }
+
+        emptyEl.style.display = 'none';
+
+        for (const r of reports) {
+          const card = document.createElement('div');
+          card.className = 'card';
+
+          const title = escapeHtml(r.title);
+          const desc = escapeHtml(r.description);
+          const createdAt = formatDate(r.createdAt);
+          const imageUrl = r.imageUrl || r.image_url || null;
+
+          card.innerHTML = `
+            <h3>${title}</h3>
+            <div class="meta">${createdAt ? 'Created: ' + escapeHtml(createdAt) : ''}</div>
+            <p class="desc">${desc}</p>
+            ${imageUrl ? `<img class="img" src="${escapeHtml(imageUrl)}" alt="Report image" loading="lazy" />` : ''}
+          `;
+
+          reportsEl.appendChild(card);
+        }
+      }
+
+      async function loadReports() {
+        try {
+          setStatus('', '');
+          const res = await fetch('/reports');
+          if (!res.ok) throw new Error('Failed to fetch reports');
+          const data = await res.json();
+          renderReports(Array.isArray(data) ? data : []);
+        } catch (err) {
+          console.error(err);
+          setStatus('Failed to load reports. Check console.', 'error');
+        }
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const title = form.title.value.trim();
+        const description = form.description.value.trim();
+        const file = form.image.files[0];
+
+        if (!title || !description) {
+          setStatus('Title and description are required.', 'error');
+          return;
+        }
+
+        const fd = new FormData();
+        fd.append('title', title);
+        fd.append('description', description);
+        if (file) fd.append('image', file);
+
+        try {
+          submitBtn.disabled = true;
+          setStatus('Submitting...', '');
+
+          const res = await fetch('/reports', {
+            method: 'POST',
+            body: fd,
+          });
+
+          const result = await res.json().catch(() => ({}));
+
+          if (!res.ok) {
+            const msg = result.message || 'Failed to create report';
+            throw new Error(msg);
+          }
+
+          setStatus(result.message || 'Report created!', 'success');
+          form.reset();
+          await loadReports();
+        } catch (err) {
+          console.error(err);
+          setStatus(err.message || 'Error submitting report', 'error');
+        } finally {
+          submitBtn.disabled = false;
+        }
+      });
+
+      resetBtn.addEventListener('click', () => {
+        form.reset();
+        setStatus('', '');
+      });
+
+      reloadBtn.addEventListener('click', loadReports);
+
+      // initial load
+      loadReports();
+    </script>
+  </body>
+</html>
