@@ -1,0 +1,30 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy to EC2 using SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            # Sesuaikan dengan direktori clone project di server EC2 Anda
+            cd ~/trashtrack-cloud-app
+            
+            # Pull update terbaru dari repository
+            git pull origin main
+            
+            # Build ulang dan jalankan container di background
+            docker-compose up -d --build
